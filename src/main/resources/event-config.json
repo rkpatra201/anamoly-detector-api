@@ -1,0 +1,7 @@
+{
+  "fd0a635d-2aaf-4460-a817-6353e1b6c050": {
+    "sensorId": "fd0a635d-2aaf-4460-a817-6353e1b6c050",
+    "model": "UpperBoundThresholdAnomalyDetector",
+    "threshold": "27.0"
+  }
+}
