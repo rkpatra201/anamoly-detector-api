@@ -1,5 +1,6 @@
 package com.spring.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.builder.EventResponseBuilder;
@@ -7,6 +8,8 @@ import com.spring.model.Event;
 import com.spring.model.EventConfig;
 import com.spring.model.EventResponse;
 import com.spring.model.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ import java.util.Map;
 @Service
 public class EventService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventService.class);
     private Map<String, EventConfig> eventConfigMap;
 
     @Autowired
@@ -31,6 +35,7 @@ public class EventService {
     }
 
     public EventResponse validateEvent(Event inputEvent) {
+        LOGGER.debug("event received: "+convertEventToJson(inputEvent));
         String sensorId = inputEvent.getSensorId();
         Status status = null;
         if (!eventConfigMap.containsKey(sensorId)) {
@@ -65,5 +70,13 @@ public class EventService {
             throw new RuntimeException(e);
         }
         Collections.unmodifiableMap(eventConfigMap);
+    }
+    private String convertEventToJson(Event e)
+    {
+        try {
+            return objectMapper.writeValueAsString(e);
+        } catch (JsonProcessingException e1) {
+            throw new RuntimeException(e1);
+        }
     }
 }
