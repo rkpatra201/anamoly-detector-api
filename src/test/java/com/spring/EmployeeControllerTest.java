@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Random;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,17 +34,21 @@ public class EmployeeControllerTest {
         e.setSensorId("fd0a635d-2aaf-4460-a817-6353e1b6c050");
         e.setEventId(UUID.randomUUID().toString());
         e.setTimestamp(1234567890);
-        e.setValue(26d);
+        e.setValue(26d);// avg is 26 and less than threshold
         MvcResult mvcResult = getMvcResult(mvc, e);
         doAssert(mvcResult, Status.NO_ANOMALY);
 
         // value is same as threshold 27
-        e.setValue(27d);
+        e.setValue(27d);// avg is 26.5 and less than threshold
         mvcResult = getMvcResult(mvc, e);
         doAssert(mvcResult, Status.NO_ANOMALY);
 
         // value is greater than threshold 27
-        e.setValue(28d);
+        e.setValue(28d); // avg is 27 and same as threshold
+        mvcResult = getMvcResult(mvc, e);
+        doAssert(mvcResult, Status.NO_ANOMALY);
+
+        e.setValue(35d); // avg is 29 and more than threshold
         mvcResult = getMvcResult(mvc, e);
         doAssert(mvcResult, Status.ANOMALY);
 

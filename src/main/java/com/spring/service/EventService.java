@@ -25,7 +25,8 @@ public class EventService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventService.class);
     private Map<String, EventConfig> eventConfigMap;
-
+    private double sumValue=0;
+    private int eventCount = 0;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -46,11 +47,14 @@ public class EventService {
         return new EventResponseBuilder(inputEvent, status).build();
     }
 
-    private Status evaluateEventStatus(Event inputEvent) {
+    private synchronized Status evaluateEventStatus(Event inputEvent) {
         double value = inputEvent.getValue();
         EventConfig eventConfig = eventConfigMap.get(inputEvent.getSensorId());
+        sumValue = value + sumValue;
+        eventCount = eventCount + 1;
+        double avgValue = sumValue /eventCount;
         double threshold = eventConfig.getThreshold();
-        int result = Double.compare(value, threshold);
+        int result = Double.compare(avgValue, threshold);
         if (result == -1 || result == 0)
             return Status.NO_ANOMALY;
         else if (result == 1)
